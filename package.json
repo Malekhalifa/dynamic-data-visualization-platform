@@ -20,6 +20,7 @@
     "@angular/router": "^19.1.7",
     "@tailwindcss/postcss": "^4.0.8",
     "@tailwindcss/vite": "^4.0.8",
+    "@vercel/speed-insights": "^1.2.0",
     "chart.js": "^4.4.8",
     "chartjs-plugin-zoom": "^2.2.0",
     "ng2-charts": "^8.0.0",
