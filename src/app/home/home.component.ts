@@ -222,7 +222,7 @@ export class HomeComponent {
       alert('No data available to export.');
       return;
     }
-    this.exportService.exportToExcel(this.tableData, 'QueryResults');
+    this.exportService.exportToCSV(this.tableData, 'QueryResults');
   }
 
   saveQueryToHistory() {
