@@ -1,0 +1,97 @@
+<div>
+    <h2>SQL Query Interface</h2>
+    <textarea [(ngModel)]="query" placeholder="Enter SQL query"></textarea>
+    <br>
+
+    <!-- Buttons for SQL keywords -->
+    <div class="button-container">
+        <button class="sql-keyword" (click)="appendToQuery('SELECT')">SELECT</button>
+        <button class="sql-keyword" (click)="appendToQuery('FROM')">FROM</button>
+        <button class="sql-keyword" (click)="appendToQuery('WHERE')">WHERE</button>
+        <button class="sql-keyword" (click)="appendToQuery('ORDER BY')">ORDER BY</button>
+        <button class="sql-keyword" (click)="appendToQuery('LIMIT')">LIMIT</button>
+        <button class="sql-keyword" (click)="appendToQuery('GROUP BY')">GROUP BY</button>
+    </div>
+
+    <!-- Buttons for specific columns -->
+    <div class="button-container">
+        <button class="column-button" (click)="appendToQuery('cityName')">cityName</button>
+        <button class="column-button" (click)="appendToQuery('wellnessCentreName')">wellnessCentreName</button>
+        <button class="column-button" (click)="appendToQuery('card_type')">card_type</button>
+        <button class="column-button" (click)="appendToQuery('record')">Record</button>
+        <button class="table-button" (click)="appendToQuery('mytable')">mytable</button>
+    </div>
+
+    <!-- Query Templates Dropdown -->
+    <div class="button-container">
+        <label for="queryTemplates">Query Templates:</label>
+        <select id="queryTemplates" (change)="onTemplateChange($event)">
+            <option value="">Select a template</option>
+            <option *ngFor="let template of queryTemplates" [value]="template.query">{{ template.name }}</option>
+        </select>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="button-container">
+        <button class="delete-button" (click)="DeleteQuery()">Delete Query</button>
+        <button class="action-button" (click)="showTable()">Show Results</button>
+        <button class="action-button" (click)="showChart()">Show Chart</button>
+        <button *ngIf="tableData.length > 0" class="export-button" (click)="exportData()">Export to Excel</button>
+    </div>
+</div>
+
+<div *ngIf="tableData && tableData.length > 0">
+    <h3>Query Results (Table)</h3>
+    <table>
+        <tr>
+            <th *ngFor="let key of getKeys(tableData[0])">{{ key }}</th>
+        </tr>
+        <tr *ngFor="let row of tableData">
+            <td *ngFor="let key of getKeys(row)">{{ row[key] }}</td>
+        </tr>
+    </table>
+</div>
+
+<div *ngIf="chartMessage" class="chart-message">
+    {{ chartMessage }}
+</div>
+
+<div *ngIf="chartData && !chartMessage" class="chart-options">
+    <label for="chartType">Chart Type:</label>
+    <select id="chartType" [(ngModel)]="selectedChartType" (ngModelChange)="updateChart(chartData)">
+        <option *ngFor="let type of chartTypes" [value]="type">{{ type }}</option>
+    </select>
+</div>
+
+<div *ngIf="chartData && !chartMessage" class="chart-container">
+    <div class="chart-wrapper">
+        <h3>Query Results (Chart)</h3>
+        <div style="position: relative; height: 600px; width: 1000px;">
+            <canvas baseChart [datasets]="barChartData.datasets" [labels]="barChartData.labels"
+                [options]="barChartOptions" [type]="selectedChartType">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<div class="query-history-container">
+    <h3>Query History</h3>
+    <ul>
+        <li *ngFor="let item of queryHistory">
+            <span (click)="applyQuery(item.query)">{{ item.query }}</span>
+            <button (click)="markAsFavorite(item.query)"
+                [ngClass]="{'favorite': !item.isFavorite, 'unfavorite': item.isFavorite}">
+                {{ item.isFavorite ? 'Unfavorite' : 'Favorite' }}
+            </button>
+        </li>
+    </ul>
+</div>
+
+<div class="favorite-queries-container" *ngIf="favoriteQueries.length > 0">
+    <h3>Favorite Queries</h3>
+    <ul>
+        <li *ngFor="let item of favoriteQueries">
+            <span (click)="applyQuery(item.query)">{{ item.query }}</span>
+        </li>
+    </ul>
+</div>
