@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { Chart, ChartConfiguration } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts'; // Add this import
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ExportService } from '../services/export.service';
 @Component({
@@ -13,7 +14,10 @@ import { ExportService } from '../services/export.service';
   imports: [CommonModule, FormsModule, HttpClientModule, BaseChartDirective],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  providers: [BaseChartDirective]
+  providers: [
+    ExportService,
+    provideCharts(withDefaultRegisterables()), // Add this line
+  ],
 })
 export class HomeComponent {
   query: string = '';
@@ -31,6 +35,7 @@ export class HomeComponent {
   queryHistory: { query: string, isFavorite: boolean }[] = [];
   favoriteQueries: { query: string }[] = [];
 
+
   queryTemplates: { name: string, query: string }[] = [
     { name: 'Select All', query: 'SELECT * FROM mytable' },
     { name: 'Count Records', query: 'SELECT COUNT(*) FROM mytable' },
@@ -44,33 +49,6 @@ export class HomeComponent {
   constructor(private http: HttpClient, private exportService: ExportService) {
     Chart.register(zoomPlugin);
   }
-
-  showChart() {
-    this.saveQueryToHistory();
-    console.log('Query:', this.query);
-    const payload = { query: this.query };
-    this.http.post(this.URL, payload).subscribe({
-      next: (data: any) => {
-        console.log('API Response:', data);
-        this.chartData = data;
-
-        // Update columns based on query result
-        if (data.length > 0) {
-          this.columns = Object.keys(data[0]);
-          this.selectedXColumn = this.columns[0];
-          this.selectedYColumn = this.columns[1];
-        }
-
-        this.updateChart(data);
-      },
-      error: (err) => {
-        console.error('API Error:', err);
-        alert('Error: SQL Query is Required / Not Valid !');
-      }
-    });
-    this.hideTable();
-  }
-
   public barChartOptions: ChartConfiguration<'bar' | 'line' | 'pie'>['options'] = {
     responsive: true,
     plugins: {
@@ -133,23 +111,22 @@ export class HomeComponent {
     this.query = '';
     this.chartData = null;
     this.chartMessage = '';
+    this.selectedChartType = 'bar'; // Resetting the selected chart type
+    this.filterColumn = ''; // Resetting the filter column
+    this.filterValue = ''; // Resetting the filter value
+    this.selectedXColumn = ''; // Resetting the selected X column
+    this.selectedYColumn = '';
   }
 
   showTable() {
     this.saveQueryToHistory();
-    console.log('Query:', this.query);
     const payload = { query: this.query };
     this.http.post(this.URL, payload).subscribe({
       next: (data: any) => {
-        console.log('API Response:', data);
         this.tableData = data;
         this.chartData = null;
-
-        // Update columns based on query result
         if (data.length > 0) {
           this.columns = Object.keys(data[0]);
-          this.selectedXColumn = this.columns[0];
-          this.selectedYColumn = this.columns[1];
         }
       },
       error: (err) => {
@@ -166,12 +143,6 @@ export class HomeComponent {
 
 
   updateChart(data: any[]) {
-    if (data.length === 0) {
-      this.chartMessage = 'No data available to display.';
-      this.barChartData = { labels: [], datasets: [] };
-      return;
-    }
-
     const columns = Object.keys(data[0]);
 
     if (columns.length !== 2) {
@@ -283,6 +254,27 @@ export class HomeComponent {
     const selectElement = event.target as HTMLSelectElement;
     const query = selectElement.value;
     this.applyTemplate(query);
+  }
+
+  showChart() {
+    this.saveQueryToHistory();
+    const payload = { query: this.query };
+    this.http.post(this.URL, payload).subscribe({
+      next: (data: any) => {
+        this.chartData = data;
+        if (data.length > 0) {
+          this.columns = Object.keys(data[0]);
+          this.selectedXColumn = this.columns[0];
+          this.selectedYColumn = this.columns[1];
+        }
+        this.updateChart(data);
+      },
+      error: (err) => {
+        console.error('API Error:', err);
+        alert('Error: SQL Query is Required / Not Valid !');
+      },
+    });
+    this.hideTable();
   }
 
 }

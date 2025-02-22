@@ -128,6 +128,7 @@ th {
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* Center align the chart container */
 }
 
 .chart-wrapper {
@@ -135,11 +136,23 @@ th {
     max-width: 100%;
     max-height: 800px;
     overflow: hidden;
+    position: relative;
+    /* Ensure relative positioning */
 }
 
 .chart-wrapper canvas {
     max-width: 100%;
     max-height: 100%;
+    display: block;
+    /* Ensure the canvas is a block element */
+    margin: 0 auto;
+    /* Center the canvas */
+    position: absolute;
+    /* Position it absolutely */
+    left: 50%;
+    /* Move it to the center */
+    transform: translateX(-50%);
+    /* Adjust for its own width */
 }
 
 .chart-options {

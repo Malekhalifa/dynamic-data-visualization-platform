@@ -1,5 +1,5 @@
 <div>
-    <h2>SQL Query Interface</h2>
+    <h2>Query Input Panel</h2>
     <textarea [(ngModel)]="query" placeholder="Enter SQL query"></textarea>
     <br>
 
@@ -24,7 +24,7 @@
 
     <!-- Query Templates Dropdown -->
     <div class="button-container">
-        <label for="queryTemplates">Query Templates:</label>
+        <label for="queryTemplates">Predefined Queries :</label>
         <select id="queryTemplates" (change)="onTemplateChange($event)">
             <option value="">Select a template</option>
             <option *ngFor="let template of queryTemplates" [value]="template.query">{{ template.name }}</option>
@@ -41,7 +41,7 @@
 </div>
 
 <div *ngIf="tableData && tableData.length > 0">
-    <h3>Query Results (Table)</h3>
+    <h3>Results Grid</h3>
     <table>
         <tr>
             <th *ngFor="let key of getKeys(tableData[0])">{{ key }}</th>
@@ -56,7 +56,7 @@
     {{ chartMessage }}
 </div>
 
-<div *ngIf="chartData && !chartMessage" class="chart-options">
+<div *ngIf=" chartData && !chartMessage" class="chart-options">
     <label for="chartType">Chart Type:</label>
     <select id="chartType" [(ngModel)]="selectedChartType" (ngModelChange)="updateChart(chartData)">
         <option *ngFor="let type of chartTypes" [value]="type">{{ type }}</option>
@@ -65,7 +65,7 @@
 
 <div *ngIf="chartData && !chartMessage" class="chart-container">
     <div class="chart-wrapper">
-        <h3>Query Results (Chart)</h3>
+        <h3>Visualized Data Output</h3>
         <div style="position: relative; height: 600px; width: 1000px;">
             <canvas baseChart [datasets]="barChartData.datasets" [labels]="barChartData.labels"
                 [options]="barChartOptions" [type]="selectedChartType">
