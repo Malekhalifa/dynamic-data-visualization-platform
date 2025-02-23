@@ -23,7 +23,7 @@ export class HomeComponent {
   query: string = '';
   tableData: any[] = [];
   chartData: any;
-  URL: string = 'http://localhost/backend/api.php';
+  URL: string = 'database-api-php.free.nf';
   selectedXColumn: string = '';
   selectedYColumn: string = '';
   selectedChartType: 'bar' | 'line' | 'pie' = 'bar';
